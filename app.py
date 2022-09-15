@@ -2,7 +2,7 @@
 from firebase_service import ToDoCollection
 
 # Import Modules for FLASK
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_restful import Api, Resource
 from flask_cors import CORS, cross_origin
 
@@ -10,6 +10,12 @@ from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 api = Api(app)
+
+
+@app.route('/')
+def main():
+    return render_template('index.html')
+
 
 class HealthCheck(Resource):
     @app.route('/health', methods=['GET'])
@@ -34,6 +40,7 @@ class TodoItemsList(Resource):
         except Exception as ex:
             return str(ex), 400
 
+
 class GetTodoItem(Resource):
     @app.route('/getItem', methods=['POST'])
     @cross_origin(support_credentials=True)
@@ -51,6 +58,7 @@ class GetTodoItem(Resource):
         except Exception as ex:
             return str(ex), 400
 
+
 class AddToDoItem(Resource):
     @app.route('/addItem', methods=['POST'])
     @cross_origin(support_credentials=True)
@@ -66,6 +74,7 @@ class AddToDoItem(Resource):
             return jsonify(itemValue)
         except Exception as ex:
             return str(ex), 400
+
 
 class DeleteToDoItem(Resource):
     @app.route('/deleteItem', methods=['DELETE'])
@@ -84,6 +93,7 @@ class DeleteToDoItem(Resource):
         except Exception as ex:
             return str(ex), 400
 
+
 class DeleteAllToDoItems(Resource):
     @app.route('/deleteAllItems', methods=['DELETE'])
     @cross_origin(support_credentials=True)
@@ -96,6 +106,7 @@ class DeleteAllToDoItems(Resource):
             return jsonify(status)
         except Exception as ex:
             return str(ex), 400
+
 
 class UpdateToDoItem(Resource):
     @app.route('/updateItem', methods=['POST'])
@@ -114,6 +125,7 @@ class UpdateToDoItem(Resource):
         except Exception as ex:
             return str(ex), 400
 
+
 if __name__ == "__main__":
     todo = ToDoCollection()
-    app.run(debug=True) # Make sure debug is false on production environment
+    app.run(debug=True)  # Make sure debug is false on production environment

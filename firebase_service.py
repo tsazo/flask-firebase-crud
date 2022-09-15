@@ -1,6 +1,6 @@
 # Import the Firebase service
 import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import credentials, db, firestore
 
 # Other Modules
 import json
@@ -10,11 +10,12 @@ with open('appsettings.json', 'r') as json_file:
     appsettings = json.load(json_file)
 
 # Firebase-APIKey File
-API_KEY_PATH = "firebase-api-key.json" #Add your API file path
+API_KEY_PATH = "firebase-api-key.json"  # Add your API file path
 
 # Initialize the default firebase app
-certificate = credentials.Certificate(API_KEY_PATH) 
-firebaseApp = firebase_admin.initialize_app(certificate, {'databaseURL': appsettings['DatabaseURL']})
+cred = credentials.Certificate(API_KEY_PATH)
+firebaseApp = firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 
 class ToDoCollection():
@@ -22,14 +23,14 @@ class ToDoCollection():
 
     def __init__(self):
         """ Collection reference for ToDo """
-        self.collection = db.reference(appsettings['TodoCollection'])
+        self.collection = db.collection(appsettings['TodoCollection'])
         self.key = appsettings['TodoCollectionUniqueKey']
-    
+
     def __getSnapshot(self):
         """ Private method, It can access within class object 
         To get snapshot of collection """
         return self.collection.get()
-    
+
     def __findItem(self, id):
         """
             To find the item 
@@ -69,10 +70,11 @@ class ToDoCollection():
             todos.append(val)
         return todos
 
-    def getTodoItem(self,id):
+    def getTodoItem(self, id):
         """ To get the todo item as dict which matches the id else return None """
         todoList = self.getTodoItems()
-        todoItem = next((item for item in todoList if item[self.key] == id), None)
+        todoItem = next(
+            (item for item in todoList if item[self.key] == id), None)
         return todoItem
 
     def clearAllItems(self):
